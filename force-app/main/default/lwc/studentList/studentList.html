@@ -1,0 +1,23 @@
+<template>
+    <lightning-card title="Student List" icon-name="standard:student_success">
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading..." size="small"></lightning-spinner>
+        </template>
+        <template if:true={students}>
+            <template if:true={hasStudents}>
+                <lightning-datatable
+                    key-field="Id"
+                    data={students}
+                    columns={columns}
+                    hide-checkbox-column="true">
+                </lightning-datatable>
+            </template>
+            <template if:false={hasStudents}>
+                <p class="slds-p-around_medium">No students found.</p>
+            </template>
+        </template>
+        <template if:true={error}>
+            <p class="slds-text-color_error">Error loading students.</p>
+        </template>
+    </lightning-card>
+</template>
