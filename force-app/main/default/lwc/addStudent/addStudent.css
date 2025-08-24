@@ -1,0 +1,22 @@
+.custom-title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 24px;
+    letter-spacing: 1px;
+}
+
+.custom-form {
+    padding-top: 0 !important;
+}
+
+.first-input {
+    margin-top: 0 !important;
+}
+
+.custom-btn-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 32px;
+}

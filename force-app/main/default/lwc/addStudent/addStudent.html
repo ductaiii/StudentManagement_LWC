@@ -1,3 +1,60 @@
 <template>
-    
+    <lightning-card>
+        <div class="custom-title">
+            Add Student
+        </div>
+        <div class="slds-p-around_medium custom-form">
+            <lightning-input
+                class="first-input"
+                label="Name"
+                value={name}
+                onchange={handleNameChange}
+                required>
+            </lightning-input>
+            <lightning-input
+                label="Email"
+                type="email"
+                value={email}
+                onchange={handleEmailChange}
+                required>
+            </lightning-input>
+            <lightning-input
+                label="Date of Birth"
+                type="date"
+                value={dateOfBirth}
+                onchange={handleDateChange}
+                required>
+            </lightning-input>
+            <lightning-combobox
+                label="Class"
+                value={className}
+                options={classOptions}
+                onchange={handleClassChange}
+                required>
+            </lightning-combobox>
+            <lightning-combobox
+                label="Status"
+                value={status}
+                options={statusOptions}
+                onchange={handleStatusChange}
+                required>
+            </lightning-combobox>
+            <div class="custom-btn-container">
+                <lightning-button
+                    label="Add Student"
+                    variant="brand"
+                    onclick={handleAddStudent}>
+                </lightning-button>
+            </div>
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Adding..." size="small"></lightning-spinner>
+            </template>
+            <template if:true={successMessage}>
+                <div class="slds-text-color_success">{successMessage}</div>
+            </template>
+            <template if:true={errorMessage}>
+                <div class="slds-text-color_error">{errorMessage}</div>
+            </template>
+        </div>
+    </lightning-card>
 </template>

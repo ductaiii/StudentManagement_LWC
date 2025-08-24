@@ -12,4 +12,15 @@ public with sharing class StudentController {
             throw new AuraHandledException(e.getMessage());
         }
     }
+    @AuraEnabled
+public static void addStudent(String name, String email, Date dateOfBirth, String className, String status) {
+    Student__c stu = new Student__c(
+        Name = name,
+        Email__c = email,
+        Date_of_Birth__c = dateOfBirth,
+        Class__c = className,
+        Status__c = status
+    );
+    insert stu;
+}
 }

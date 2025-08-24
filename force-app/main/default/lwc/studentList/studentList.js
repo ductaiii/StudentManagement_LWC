@@ -1,5 +1,8 @@
 import { LightningElement, wire } from 'lwc';
+import { subscribe, MessageContext } from 'lightning/messageService';
+import { refreshApex } from '@salesforce/apex';
 import getStudents from '@salesforce/apex/StudentController.getStudents';
+import STUDENT_MESSAGE_CHANNEL from '@salesforce/messageChannel/studentMessageChannel__c';
 
 const COLUMNS = [
     { label: 'Name', fieldName: 'Name' },
@@ -14,13 +17,20 @@ export default class StudentList extends LightningElement {
     students;
     error;
     isLoading = true;
+    subscription = null;
+    wiredResult;
+
+    @wire(MessageContext)
+    messageContext;
 
     get hasStudents() {
         return this.students && this.students.length > 0;
     }
 
     @wire(getStudents)
-    wiredStudents({ data, error }) {
+    wiredStudents(result) {
+        this.wiredResult = result;
+        const { data, error } = result;
         this.isLoading = false;
         if (data) {
             this.students = data;
@@ -28,6 +38,21 @@ export default class StudentList extends LightningElement {
         } else if (error) {
             this.error = error;
             this.students = undefined;
+        }
+    }
+
+    connectedCallback() {
+        this.subscription = subscribe(
+            this.messageContext,
+            STUDENT_MESSAGE_CHANNEL,
+            (message) => this.handleMessage(message)
+        );
+    }
+
+    handleMessage(message) {
+        console.log('Message đã nhận là:', message);
+        if (message.studentAdded) {
+            refreshApex(this.wiredResult);
         }
     }
 }
