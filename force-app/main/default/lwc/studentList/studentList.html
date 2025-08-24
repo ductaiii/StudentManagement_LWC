@@ -3,17 +3,28 @@
         <template if:true={isLoading}>
             <lightning-spinner alternative-text="Loading..." size="small"></lightning-spinner>
         </template>
-        <template if:true={students}>
-            <template if:true={hasStudents}>
+        <div class="slds-p-around_medium slds-grid slds-gutters slds-wrap">
+            <div class="slds-col slds-size_1-of-3">
+                <lightning-input type="search" label="Search Name or Email" value={searchKey} onchange={handleSearchKeyChange} placeholder="Enter name or email..." ></lightning-input>
+            </div>
+            <div class="slds-col slds-size_1-of-6">
+                <lightning-combobox label="Class" value={filterClass} options={classOptions} onchange={handleClassFilterChange} placeholder="All Classes"></lightning-combobox>
+            </div>
+            <div class="slds-col slds-size_1-of-6">
+                <lightning-combobox label="Status" value={filterStatus} options={statusOptions} onchange={handleStatusFilterChange} placeholder="All Status"></lightning-combobox>
+            </div>
+        </div>
+        <template if:true={filteredStudents}>
+            <template if:true={hasFilteredStudents}>
                 <lightning-datatable
                     key-field="Id"
-                    data={students}
+                    data={filteredStudents}
                     columns={columns}
                     hide-checkbox-column="true"
                     onrowaction={handleRowAction}>
                 </lightning-datatable>
             </template>
-            <template if:false={hasStudents}>
+            <template if:false={hasFilteredStudents}>
                 <p class="slds-p-around_medium">No students found.</p>
             </template>
         </template>
