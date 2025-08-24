@@ -40,11 +40,32 @@
                 required>
             </lightning-combobox>
             <div class="custom-btn-container">
-                <lightning-button
-                    label="Add Student"
-                    variant="brand"
-                    onclick={handleAddStudent}>
-                </lightning-button>
+                <template if:false={isEditMode}>
+                    <lightning-button
+                        label="Add Student"
+                        variant="brand"
+                        onclick={handleAddStudent}>
+                    </lightning-button>
+                </template>
+                <template if:true={isEditMode}>
+                    <lightning-button
+                        label="Edit Student"
+                        variant="brand"
+                        onclick={handleEditStudent}>
+                    </lightning-button>
+                    <lightning-button
+                        label="Delete Student"
+                        variant="destructive"
+                        onclick={handleDeleteStudentClick}
+                        class="slds-m-left_small">
+                    </lightning-button>
+                    <lightning-button
+                        label="Cancel"
+                        variant="neutral"
+                        onclick={handleCancelEdit}
+                        class="slds-m-left_small">
+                    </lightning-button>
+                </template>
             </div>
             <template if:true={isLoading}>
                 <lightning-spinner alternative-text="Adding..." size="small"></lightning-spinner>

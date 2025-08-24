@@ -23,4 +23,20 @@ public static void addStudent(String name, String email, Date dateOfBirth, Strin
     );
     insert stu;
 }
+@AuraEnabled
+public static void updateStudent(String studentId, String name, String email, Date dateOfBirth, String className, String status) {
+    Student__c stu = [SELECT Id FROM Student__c WHERE Id = :studentId LIMIT 1];
+    stu.Name = name;
+    stu.Email__c = email;
+    stu.Date_of_Birth__c = dateOfBirth;
+    stu.Class__c = className;
+    stu.Status__c = status;
+    update stu;
+}
+
+@AuraEnabled
+public static void deleteStudent(String studentId) {
+    Student__c stu = [SELECT Id FROM Student__c WHERE Id = :studentId LIMIT 1];
+    delete stu;
+}
 }

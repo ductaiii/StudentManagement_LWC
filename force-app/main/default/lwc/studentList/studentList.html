@@ -9,7 +9,8 @@
                     key-field="Id"
                     data={students}
                     columns={columns}
-                    hide-checkbox-column="true">
+                    hide-checkbox-column="true"
+                    onrowaction={handleRowAction}>
                 </lightning-datatable>
             </template>
             <template if:false={hasStudents}>
