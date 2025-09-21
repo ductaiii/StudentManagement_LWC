@@ -13,6 +13,9 @@
             <div class="slds-col slds-size_1-of-6">
                 <lightning-combobox label="Status" value={filterStatus} options={statusOptions} onchange={handleStatusFilterChange} placeholder="All Status"></lightning-combobox>
             </div>
+            <div class="slds-col slds-size_1-of-6 slds-align_absolute-center">
+                <lightning-button label="Export PDF" icon-name="utility:download" onclick={handleExportPdf} variant="brand-outline"></lightning-button>
+            </div>
         </div>
         <template if:true={filteredStudents}>
             <template if:true={hasFilteredStudents}>

@@ -1,4 +1,8 @@
 import { LightningElement, wire } from 'lwc';
+import { loadScript } from 'lightning/platformResourceLoader';
+import jsPDFResource from '@salesforce/resourceUrl/jsPDF';
+import jsPDFAutoTableResource from '@salesforce/resourceUrl/jsPDFAutoTable';
+import robotoFontResource from '@salesforce/resourceUrl/roboto';
 import { subscribe, publish, MessageContext } from 'lightning/messageService';
 import { refreshApex } from '@salesforce/apex';
 import getStudents from '@salesforce/apex/StudentController.getStudents';
@@ -79,6 +83,8 @@ export default class StudentList extends LightningElement {
         }
     }
 
+    jsPdfInitialized = false;
+
     connectedCallback() {
         this.subscription = subscribe(
             this.messageContext,
@@ -86,6 +92,81 @@ export default class StudentList extends LightningElement {
             (message) => this.handleMessage(message)
         );
     }
+
+    renderedCallback() {
+        if (this.jsPdfInitialized) return;
+        this.jsPdfInitialized = true;
+        Promise.all([
+            loadScript(this, jsPDFResource),
+            loadScript(this, jsPDFAutoTableResource),
+            loadScript(this, robotoFontResource)
+        ])
+        .then(() => {
+            // jsPDF, autotable, roboto loaded
+        })
+        .catch(error => {
+            // eslint-disable-next-line no-console
+            console.error('jsPDF, autotable, or roboto load error', error);
+        });
+    }
+     handleExportPdf() {
+        // Check if jsPDF and AutoTable are loaded
+        const jsPDF = window.jspdf && window.jspdf.jsPDF ? window.jspdf.jsPDF : window.jsPDF;
+        if (!jsPDF || !(jsPDF.prototype || jsPDF.API).autoTable) {
+            alert('jsPDF hoặc AutoTable chưa được load!');
+            return;
+        }
+
+        // Prepare PDF document
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+        // Font handling: chỉ cần setFont('Roboto') nếu static resource đã đúng chuẩn UMD
+        if (doc.getFontList && doc.getFontList().indexOf('Roboto') === -1) {
+            alert('Font Roboto chưa được đăng ký vào jsPDF!\nHãy kiểm tra lại file roboto.js static resource (nên dùng dạng UMD, không phải ES module).');
+            return;
+        }
+        doc.setFont('Roboto');
+
+        // Header
+        doc.setFontSize(18);
+        doc.text('DANH SÁCH HỌC SINH', 148, 18, { align: 'center' });
+        doc.setFontSize(12);
+        doc.text('Trường: ABC', 14, 28);
+        doc.text('Lớp: ' + (this.filterClass || 'Tất cả'), 14, 36);
+        doc.text('Trạng thái: ' + (this.filterStatus || 'Tất cả'), 60, 36);
+        doc.text('Thời gian xuất: ' + (new Date()).toLocaleString(), 14, 44);
+
+        // Table data
+        const headers = [['STT', 'Họ tên', 'Email', 'Ngày sinh', 'Lớp', 'Trạng thái']];
+        const rows = this.filteredStudents.map((s, idx) => [
+            (idx + 1).toString(),
+            s.Name || '',
+            s.Email__c || '',
+            s.Date_of_Birth__c || '',
+            s.Class__c || '',
+            s.Status__c || ''
+        ]);
+
+        // Draw table
+        doc.autoTable({
+            head: headers,
+            body: rows,
+            startY: 50,
+            styles: { font: 'Roboto', fontStyle: 'normal', fontSize: 11 },
+            headStyles: { fillColor: [41, 128, 185], textColor: 255, fontStyle: 'bold', halign: 'center', font: 'Roboto' },
+            bodyStyles: { halign: 'center', font: 'Roboto' },
+            columnStyles: {
+                1: { halign: 'left', font: 'Roboto' }, // Họ tên căn trái
+                2: { halign: 'left', font: 'Roboto' }  // Email căn trái
+            },
+            margin: { left: 14, right: 14 },
+            didDrawPage: function (data) {
+                // Optional: Add footer or watermark here
+            }
+        });
+        doc.save('danh-sach-hoc-sinh.pdf');
+    }
+
 
     handleMessage(message) {
         if (message.studentAdded) {
